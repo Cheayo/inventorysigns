@@ -4,14 +4,14 @@ require 'rtf'
 
 include RTF
 
-xls = RubyXL::Parser.parse(ARGV[0]) #'c:/users/lessa/desktop/inventory labels data set CLEAN.xlsx'
+xls = RubyXL::Parser.parse(ARGV[0])
 data = xls.worksheets[0]
 
 document = Document.new(Font.new(Font::ROMAN, 'Arial'))
 
 styles = {}
 styles['BAR_CODE'] = CharacterStyle.new
-styles['BAR_CODE'].font = Font.new(Font::NIL, 'Wingdings')
+styles['BAR_CODE'].font = Font.new(Font::NIL, 'Wingdings') #for testing; will be incorporating Barby to generate code 128 barcodes
 
 i = 1;
 
