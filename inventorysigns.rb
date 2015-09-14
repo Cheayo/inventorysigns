@@ -12,10 +12,11 @@ data = xls.worksheets[0]
 
 document = Document.new(Font.new(Font::ROMAN, 'Arial'))
 
-i = 1;
+i = 1
+lines = 0
 while defined?(data.sheet_data[i][4].value)
 	copies = data.sheet_data[i][4].value
-	
+		
 	barcode = Barby::Code128B.new(data.sheet_data[i][3].value)
 	blob = Barby::PngOutputter.new(barcode)
 	blob.height = 50
@@ -34,6 +35,12 @@ while defined?(data.sheet_data[i][4].value)
 		image = document.image('barcode.png')
 		document.paragraph do |p|
 			p.line_break
+		end
+		
+		lines += 1
+		puts lines
+		if (lines % 5 == 0)
+			document.page_break
 		end
 	end
 	
