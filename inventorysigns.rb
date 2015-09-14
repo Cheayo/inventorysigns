@@ -1,6 +1,9 @@
 require 'rubyXL'
 require 'rubygems'
 require 'rtf'
+require 'barby'
+require 'barby/barcode/code_128'
+require 'barby/outputter/png_outputter'
 
 include RTF
 
@@ -9,15 +12,16 @@ data = xls.worksheets[0]
 
 document = Document.new(Font.new(Font::ROMAN, 'Arial'))
 
-styles = {}
-styles['BAR_CODE'] = CharacterStyle.new
-styles['BAR_CODE'].font = Font.new(Font::NIL, 'Wingdings') #for testing; will be incorporating Barby to generate code 128 barcodes
-
 i = 1;
-
 while defined?(data.sheet_data[i][4].value)
 	copies = data.sheet_data[i][4].value
-		
+	
+	barcode = Barby::Code128B.new(data.sheet_data[i][3].value)
+	blob = Barby::PngOutputter.new(barcode)
+	blob.height = 50
+	blob.xdim = 2
+	File.open('barcode.png', 'wb') {|f| f.write blob.to_png}
+	
 	copies.times do 
 		document.paragraph do |p|
 			p << "QMI\t\tMARKER"
@@ -25,10 +29,11 @@ while defined?(data.sheet_data[i][4].value)
 			p << data.sheet_data[i][2].value
 			p.line_break
 			p << data.sheet_data[i][1].value
+		end
+		
+		image = document.image('barcode.png')
+		document.paragraph do |p|
 			p.line_break
-			p.apply(styles['BAR_CODE']) do |bc|
-				bc << "\t" + data.sheet_data[i][3].value
-			end
 		end
 	end
 	
