@@ -7,14 +7,14 @@ require 'barby/outputter/png_outputter'
 
 include RTF
 
-xls = RubyXL::Parser.parse(ARGV[0])  /*breaks apart the source Excel file*/
+xls = RubyXL::Parser.parse(ARGV[0])  /*accepts the source Excel file*/
 data = xls.worksheets[0]
 
 document = Document.new(Font.new(Font::ROMAN, 'Arial'))
 
 i = 1
 lines = 0
-while defined?(data.sheet_data[i][4].value)
+while defined?(data.sheet_data[i][4].value)  /*breakdown of Excel file*/
 	copies = data.sheet_data[i][4].value  /*number of inventory signs varies*/
 		
 	barcode = Barby::Code128B.new(data.sheet_data[i][3].value) /*converts data to code 128 barcode */
@@ -48,3 +48,6 @@ while defined?(data.sheet_data[i][4].value)
 end
 
 File.open('inventorylabels.rtf', 'w+') {|file| file.write(document.to_rtf)} /*write to the rtf file*/
+
+ObjectSpace.each_object(IO) {|f| f.close unless f.closed? } /*close any and all instances of the png so it can be deleted*/
+File.delete('barcode.png')
