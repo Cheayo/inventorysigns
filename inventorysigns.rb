@@ -1,13 +1,13 @@
-require 'rubyXL'
+require 'rubyXL' /*for processing Excel file*/
 require 'rubygems'
-require 'rtf'
-require 'barby'
+require 'rtf'   /*makes rtf document*/
+require 'barby' /*makes barcodes*/
 require 'barby/barcode/code_128'
 require 'barby/outputter/png_outputter'
 
 include RTF
 
-xls = RubyXL::Parser.parse(ARGV[0])
+xls = RubyXL::Parser.parse(ARGV[0])  /*breaks apart the source Excel file*/
 data = xls.worksheets[0]
 
 document = Document.new(Font.new(Font::ROMAN, 'Arial'))
@@ -15,16 +15,16 @@ document = Document.new(Font.new(Font::ROMAN, 'Arial'))
 i = 1
 lines = 0
 while defined?(data.sheet_data[i][4].value)
-	copies = data.sheet_data[i][4].value
+	copies = data.sheet_data[i][4].value  /*number of inventory signs varies*/
 		
-	barcode = Barby::Code128B.new(data.sheet_data[i][3].value)
+	barcode = Barby::Code128B.new(data.sheet_data[i][3].value) /*converts data to code 128 barcode */
 	blob = Barby::PngOutputter.new(barcode)
 	blob.height = 50
 	blob.xdim = 2
-	File.open('barcode.png', 'wb') {|f| f.write blob.to_png}
+	File.open('barcode.png', 'wb') {|f| f.write blob.to_png}  /*barcode is png file*/
 	
-	copies.times do 
-		document.paragraph do |p|
+	copies.times do  /*builds this label and adds it to the rtf file*/ 
+		document.paragraph do |p| 
 			p << "QMI\t\tMARKER"
 			p.line_break
 			p << data.sheet_data[i][2].value
@@ -47,4 +47,4 @@ while defined?(data.sheet_data[i][4].value)
 	i += 1
 end
 
-File.open('inventorylabels.rtf', 'w+') {|file| file.write(document.to_rtf)}
+File.open('inventorylabels.rtf', 'w+') {|file| file.write(document.to_rtf)} /*write to the rtf file*/
